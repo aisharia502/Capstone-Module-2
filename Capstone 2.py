@@ -1,111 +1,100 @@
-import math
+import uuid
 
 # Data barang disimpan dalam list of dictionary
-toko_pakaian = []  # List
+baju_list = []
 
 def tampilkan_menu():
-    print("\n===== MENU TOKO PAKAIAN =====")
-    print("1. Tampilkan Produk")
+    print("\n===== TOKO BAJU BOOSANA  =====")
+    print("1. Tampilkan Data Baju")
     print("2. Tambah Produk")
     print("3. Ubah Produk")
     print("4. Hapus Produk")
-    print("5. Keluar")
+    print("5. Exit")
 
-def tampilkan_produk(data):
+def tampilkan_baju(data):
     if not data:
-        print("Belum ada produk yang ditambahkan.")
+        print("Belum ada data baju.")
         return
-    print("\nDAFTAR PRODUK:")
-    for i, produk in enumerate(data, start=1):
-        print(f"{i}. Nama: {produk['nama']} | Kategori: {produk['kategori']} | Harga: {produk['harga']} | Stok: {produk['stok']}")
+    print("\nDATA BAJU TOKO:")
+    for baju in data:
+        print(f"UID: {baju['uid']} | Nama: {baju['nama']} | Kategori: {baju['kategori']} | Harga: Rp {int(baju['harga']):,} | Stok: {baju['stok']}")
 
-def tambah_produk():
-    nama = input("Nama produk: ")                              # String
-    kategori = input("Kategori (Atasan/Celana/Jaket): ")       # String
-    harga = float(input("Harga: "))                            # Casting ke float
-    stok = int(input("Stok: "))                                # Casting ke int
+def cari_baju_berdasarkan_uid(uid):
+    for baju in baju_list:
+        if baju['uid'] == uid:
+            return baju
+    return None
 
-    produk = {
+def konfirmasi_aksi(pesan="Apakah Anda yakin? (y/n): "):
+    konfirmasi = input(pesan)
+    return konfirmasi.lower() == "y"
+
+def tambah_baju():
+    nama = input("Nama baju: ")
+    kategori = input("Kategori baju: ")
+    harga = float(input("Harga baju: "))
+    stok = int(input("Stok baju: "))
+    uid_baju = str(uuid.uuid4())[:8]
+    baju = {
+        "uid": uid_baju,
         "nama": nama,
         "kategori": kategori,
         "harga": harga,
         "stok": stok
     }
-    toko_pakaian.append(produk)
-    print("Produk berhasil ditambahkan.")
+    baju_list.append(baju)
+    print("Barang berhasil ditambahkan.")
 
-def ubah_produk():
-    tampilkan_produk(toko_pakaian)
-    index = int(input("Masukkan nomor produk yang ingin diubah: ")) - 1
-    if 0 <= index < len(toko_pakaian):
-        produk = toko_pakaian[index]
-        nama = input(f"Nama [{produk['nama']}]: ") or produk['nama']
-        kategori = input(f"Kategori [{produk['kategori']}]: ") or produk['kategori']
-        harga_input = input(f"Harga [{produk['harga']}]: ")
-        harga = float(harga_input) if harga_input else produk['harga']
-        stok_input = input(f"Stok [{produk['stok']}]: ")
-        stok = int(stok_input) if stok_input else produk['stok']
+def ubah_baju():
+    uid = input("Masukkan UID baju yang ingin diubah: ")
+    baju = cari_baju_berdasarkan_uid(uid)
+    if baju:
+        print("Baju ditemukan.")
+        nama = input(f"Nama [{baju['nama']}]: ") or baju['nama']
+        kategori = input(f"Kategori [{baju['kategori']}]: ") or baju['kategori']
+        harga_input = input(f"Harga [{baju['harga']}]: ")
+        harga = float(harga_input) if harga_input else baju['harga']
+        stok_input = input(f"Stok [{baju['stok']}]: ")
+        stok = int(stok_input) if stok_input else baju['stok']
 
-        produk.update({
+        baju.update({
             "nama": nama,
             "kategori": kategori,
             "harga": harga,
             "stok": stok
         })
-        print("Produk berhasil diubah.")
+        print("Baju berhasil diubah.")
     else:
-        print("Nomor tidak valid.")
+        print("Baju tidak ditemukan.")
 
-def hapus_produk():
-    tampilkan_produk(toko_pakaian)
-    index = int(input("Masukkan nomor produk yang ingin dihapus: ")) - 1
-    if 0 <= index < len(toko_pakaian):
-        if input("Yakin ingin menghapus produk ini? (y/n): ").lower() == 'y':  # If Else Statement
-            del toko_pakaian[index]
-            print("Produk berhasil dihapus.")
-        else:
-            print("Penghapusan dibatalkan.")
+def hapus_baju():
+    uid = input("Masukkan UID baju yang ingin dihapus: ")
+    baju = cari_baju_berdasarkan_uid(uid)
+    if baju:
+        tampilkan_baju([baju])
+        if konfirmasi_aksi("Yakin ingin menghapus baju ini? (y/n): "):
+            baju_list.remove(baju)
+            print("Baju berhasil dihapus.")
     else:
-        print("Nomor tidak valid.")
+        print("Baju tidak ditemukan.")
 
-# Function tanpa input/output
-def ucapan_terima_kasih():
-    print("Terima kasih telah menggunakan sistem toko pakaian.")
-
-# Function dengan input tapi tanpa output
-def cetak_nama_kasir(nama):
-    print("Kasir hari ini adalah:", nama)
-
-# Function dengan default parameter
-def sapa_pengguna(nama="Pengunjung"):
-    print(f"Halo, {nama}! Selamat datang di Toko Pakaian.")
-
-# Function dengan input & output
-def hitung_total(harga, jumlah):
-    total = harga * jumlah
-    return total
-
-def main():  # While Loop utama
-    sapa_pengguna()                     # Default parameter
-    cetak_nama_kasir("Aisyah")          # Function with input
-
+def main():
     while True:
         tampilkan_menu()
         pilihan = input("Pilih menu (1-5): ")
 
         if pilihan == "1":
-            tampilkan_produk(toko_pakaian)
+            tampilkan_baju(baju_list)
         elif pilihan == "2":
-            tambah_produk()
+            tambah_baju()
         elif pilihan == "3":
-            ubah_produk()
+            ubah_baju()
         elif pilihan == "4":
-            hapus_produk()
+            hapus_baju()
         elif pilihan == "5":
-            ucapan_terima_kasih()
+            print("Keluar dari program. Terima kasih.")
             break
         else:
-            print("Pilihan tidak tersedia.")
+            print("Pilihan tidak valid, silakan coba lagi.")
 
 main()
-
